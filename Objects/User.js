@@ -1,4 +1,4 @@
-const dbconfig = require('../utiils/connnection_sql');
+const dbconfig = require('../utils/connnection_sql');
 const mssql = require('mssql')
 const bcrypt = require('bcrypt')
 const randomstring = require("randomstring");
@@ -19,7 +19,6 @@ function saveUserTASK(User, callback) {
       ps.input('pekerjaan', mssql.VarChar(25));
       ps.input('no_handphone', mssql.VarChar(15));
       ps.prepare("execute save_user @id_ktp,@nama,@tempat_lahir,@tanggal_lahir,@alamat,@jenis_kelamin,@pekerjaan,@no_handphone", err => {
-
           ps.execute({
               id_ktp: User.id_ktp,
               nama: User.nama,
@@ -33,7 +32,8 @@ function saveUserTASK(User, callback) {
               // console.dir(err);
               if (err) {
                 callback({
-                  error: true
+                  error: true,
+                  massage : "User is Registered"
                 });
               } else {
                 let row = result.recordset;
@@ -75,6 +75,7 @@ const saveUsers  = async (id_ktp,plainText,callback) => {
         .input('id', mssql.VarChar(15), randomstring.generate(7))
         .input('id_ktp', mssql.Char(16) ,id_ktp)
         .input('password', mssql.VarChar(200) ,hash)
+        .input('key',mssql.VarChar(200),randomstring.generate(20))
         .execute('loginTask')
   
       await callback(result2);
@@ -93,8 +94,8 @@ const getUser = async (id_ktp,callback) => {
         .input('idktp', mssql.Char(16) ,id_ktp)
         .execute('getUser')
   
-      await callback(result2.recordset);
-      await mssql.close();
+      await callback(result2);
+       mssql.close();
   
   } catch (err) {
     console.log(err);
@@ -111,9 +112,9 @@ const cek_login = async (id_ktp,no_hp,plainText,callback) => {
         .input('no_hp',mssql.VarChar(5),no_hp)
         .execute('getLoginTask')
         // let verify = await bcrypt.compareSync(plainText,);
-
-      await callback(result2.recordset.password_login);
-      await mssql.close();
+  
+      callback(result2.recordset);
+      mssql.close();
   
   } catch (err) {
     console.log(err);

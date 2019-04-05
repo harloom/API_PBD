@@ -1,4 +1,4 @@
-const dbconfig = require('../utiils/connnection_sql');
+const dbconfig = require('../utils/connnection_sql');
 const mssql = require('mssql')
 
 
