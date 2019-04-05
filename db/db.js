@@ -37,54 +37,10 @@ async function executeProcedure(sql, callback) {
 }
 
 
-async function saveUserTASK(User, callback) {
-  let connection = new mssql.ConnectionPool(dbconfig, function (err) {
-    const ps = new mssql.PreparedStatement(connection);
-    ps.input('id_ktp', mssql.Char(16));
-    ps.input('nama', mssql.VarChar(50));
-    ps.input('tempat_lahir', mssql.VarChar(25));
-    ps.input('tanggal_lahir', mssql.Date);
-    ps.input('alamat', mssql.VarChar(100));
-    ps.input('jenis_kelamin', mssql.VarChar(15));
-    ps.input('pekerjaan', mssql.VarChar(25));
-    ps.input('no_handphone', mssql.VarChar(15));
-    ps.prepare("execute save_user  @id_ktp, @nama, @tempat_lahir,  @tanggal_lahir,  @alamat,@jenis_kelamin, @pekerjaan, @no_handphone", err => {
-      ps.execute({
-          id_ktp: User.id_ktp,
-          nama: User.nama,
-          tempat_lahir: User.tempat_lahir,
-          tanggal_lahir: User.tanggal_lahir,
-          alamat: User.alamat,
-          jenis_kelamin: User.jenis_kelamin,
-          pekerjaan: User.pekerjaan,
-          no_handphone: User.no_handphone
-        },
-        (err, result) => {
-          if (err) {
-            callback({massage : "Account is Registered"});
-          }
-          else  {
-            callback({massage : "Registrasi Success"});
-            ps.unprepare(err => {
-              console.log(err);
-            })
 
-          }
-        })
-
-    })
-
-
-  });
-
-
-
-
-}
 
 module.exports.executeSQL = executeSQL;
 module.exports.executePro = executeProcedure;
-module.exports.executeUsers = saveUserTASK;
 
 
 

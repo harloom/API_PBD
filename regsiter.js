@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const Joi = require('joi');
+
 // const dbconfig  = require('./utiils/connnection_sql');
 // const mssql = require('mssql');
-const db = require('./db/db');
+const User = require('./Objects/User');
 router.post('/', (req, res) => {
 
   const resultValidate = Joi.validate(req.body, SchemaUser, {
@@ -11,11 +12,19 @@ router.post('/', (req, res) => {
   });
   if (resultValidate.error) {
     res.status(400).send(resultValidate.error.details[0].message);
+  } else {
+    let values = resultValidate.value;
+    User.saveUser(values, (result) => {
+
+      if(result.row){
+        User.savePassword(result.row[0].id_ktp,values.password,(flag)=>{
+          res.status(200).send({massage : true });
+        })
+      }
+    }); 
+
   }
-  let values = resultValidate.value;
-  db.executeUsers(values,(result)=>{
-    res.status(200).send(result);
-  });
+
 
 });
 
@@ -29,7 +38,8 @@ const SchemaUser = {
   alamat: Joi.string().min(3).max(100).required(),
   jenis_kelamin: Joi.any().valid(['Male', 'Female']).required(),
   pekerjaan: Joi.string().min(3).max(25).required(),
-  no_handphone: Joi.string().min(11).max(15).required()
+  no_handphone: Joi.string().min(11).max(15).required(),
+  password: Joi.string().min(8).max(200).required()
 
 }
 module.exports = router;
