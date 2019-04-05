@@ -1,9 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const Joi = require('joi');
-
-// const dbconfig  = require('./utiils/connnection_sql');
-// const mssql = require('mssql');
 const User = require('./Objects/User');
 router.post('/', (req, res) => {
 
@@ -15,12 +12,15 @@ router.post('/', (req, res) => {
   } else {
     let values = resultValidate.value;
     User.saveUser(values, (result) => {
-
       if(result.row){
         User.savePassword(result.row[0].id_ktp,values.password,(flag)=>{
           res.status(200).send({massage : true });
         })
+      }else{
+        res.status(400).send(result);
       }
+
+
     }); 
 
   }

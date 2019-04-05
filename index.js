@@ -6,25 +6,11 @@ const helmet = require('helmet')
 const morgan = require('morgan');
 const logins = require('./authentication');
 const registers = require('./regsiter');
-const requests  = require('./main_api/request_list') ;
+const mainAPI  = require('./main_api/request_list') ;
 app.use(express.json())
 app.use(helmet());
 app.use(morgan('tiny'));
 app.use(express.urlencoded({extended : true}));
-
-//config  
-const config = {
-  user: '...',
-  password: '...',
-  server: 'localhost',
-  database: '...',
-  pool: {
-      max: 10,
-      min: 0,
-      idleTimeoutMillis: 30000
-  }
-}
-
 
 app.use((req,res,next)=> {
   console.log("Logging.......");
@@ -44,7 +30,7 @@ app.use('/api/v1/authentication',logins);
 app.use('/api/v1/register',registers);
 
 //all request
-app.use('/api/v1/data' ,requests );
+app.use('/api/v1/data' ,mainAPI);
 
 
 // error handle
