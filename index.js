@@ -10,6 +10,7 @@ const requests  = require('./main_api/request_list') ;
 app.use(express.json())
 app.use(helmet());
 app.use(morgan('tiny'));
+app.use(express.urlencoded({extended : true}));
 
 //config  
 const config = {
@@ -23,6 +24,7 @@ const config = {
       idleTimeoutMillis: 30000
   }
 }
+
 
 app.use((req,res,next)=> {
   console.log("Logging.......");
