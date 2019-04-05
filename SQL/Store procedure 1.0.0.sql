@@ -230,3 +230,12 @@ END;
 
 
 
+create procedure loginTask 
+@id varchar(15),
+@id_ktp char(16),
+@password varchar(200)
+AS BEGIN
+	insert into login_users Values (@id,@id_ktp,@password,'');
+END;
+
+
