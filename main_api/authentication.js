@@ -1,7 +1,7 @@
 
 const express = require('express');
 const router = express.Router();
-const User = require('./Objects/User');
+const User = require('../Objects/User');
 const Joi = require('joi');
 router.post('/', (req, res) => {
     if(req.headers.key =="ktp"){
@@ -34,7 +34,7 @@ router.post('/', (req, res) => {
   }
  );
 const ScemaCekLoginKTP ={
-  id_ktp : Joi.string().min(15).max(16).required(),
+  id_ktp : Joi.string().min(16).max(16).required(),
   plaintext : Joi.string().min(8).max(30).required()
 }
 

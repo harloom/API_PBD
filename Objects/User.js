@@ -8,7 +8,7 @@ const saltRounds = 10;
 function saveUserTASK(User, callback) {
   try {
     let connection = new mssql.ConnectionPool(dbconfig, function (err) {
-      const ps = new mssql.PreparedStatement(connection);
+       const ps = new mssql.PreparedStatement(connection);
     
       ps.input('id_ktp', mssql.Char(16));
       ps.input('nama', mssql.VarChar(50));
@@ -65,17 +65,20 @@ function saveUserTASK(User, callback) {
 
 }
 
+async function  getPool (){
+  return await new mssql.ConnectionPool(dbconfig).connect();
+}
 const saveUsers  = async (id_ktp,plainText,callback) => {
   try {
 
     let salt = await bcrypt.genSaltSync(saltRounds);
     let hash = await bcrypt.hashSync(plainText, salt);
-      const pool = await mssql.connect(dbconfig)
+      const pool =  await getPool();
       const result2 = await pool.request()
         .input('id', mssql.VarChar(15), randomstring.generate(7))
         .input('id_ktp', mssql.Char(16) ,id_ktp)
         .input('password', mssql.VarChar(200) ,hash)
-        .input('key',mssql.VarChar(200),randomstring.generate(20))
+        .input('key',mssql.VarChar(200),randomstring.generate(100))
         .execute('loginTask')
   
       await callback(result2);
@@ -88,14 +91,14 @@ const saveUsers  = async (id_ktp,plainText,callback) => {
 
 const getUser = async (id_ktp,callback) => {
   try {
-    // let date = new Date().getTime();
-      let pool = await mssql.connect(dbconfig)
+
+      let pool =  await getPool();
       let result2 = await pool.request()
         .input('idktp', mssql.Char(16) ,id_ktp)
         .execute('getUser')
-  
-      await callback(result2);
-       mssql.close();
+      await  callback(result2);
+      await mssql.close();
+
   
   } catch (err) {
     console.log(err);
@@ -106,15 +109,27 @@ const getUser = async (id_ktp,callback) => {
 const cek_login = async (id_ktp,no_hp,plainText,callback) => {
   try {
     // let date = new Date().getTime();
-      const pool = await mssql.connect(dbconfig)
+      const pool = await getPool();
       const result2 = await pool.request()
         .input('id_ktp', mssql.Char(16) ,id_ktp)
         .input('no_hp',mssql.VarChar(5),no_hp)
         .execute('getLoginTask')
-        // let verify = await bcrypt.compareSync(plainText,);
-  
-      callback(result2.recordset);
-      mssql.close();
+      if(result2.rowsAffected == 1){
+        let verify = await bcrypt.compareSync(plainText,result2.recordset[0].password_login);
+        if(verify){
+          const resAPI = await pool.request()
+          .input('id',mssql.VarChar(15),result2.recordset[0].id)
+          .execute('getKeyApi')
+          await callback(resAPI.recordset[0]);
+          await mssql.close();
+        }else{
+          callback({massage : "password anda Salah"});
+        }
+      }else{
+        callback({massage : "id / password Salah!"});
+      }
+        
+
   
   } catch (err) {
     console.log(err);

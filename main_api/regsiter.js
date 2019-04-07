@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Joi = require('joi');
-const User = require('./Objects/User');
+const User = require('../Objects/User');
 router.post('/', (req, res) => {
 
   const resultValidate = Joi.validate(req.body, SchemaUser, {
