@@ -28,7 +28,7 @@ const getChart = async (id_ktp, keyAPI, callback) => {
         .execute('getChart')
       await callback(result2);
       await mssql.close();
-    }else{
+    } else {
       callback(false);
     }
 
@@ -39,11 +39,48 @@ const getChart = async (id_ktp, keyAPI, callback) => {
 
   }
 
-  const saveChart = async ()=>{
-    
-  }
-
-
 
 }
+
+const saveChart = async (Chart, _key, callback) => {
+  try {
+
+    let valid = await getValidKeyAPI(_key);
+
+    if (valid) {
+
+      let pool = await getPool();
+      let result = await pool.request()
+        .input('kode_ktp', mssql.Char(16), Chart.id_ktp)
+        .input('id_kamera', mssql.Char(5), Chart.id_kamera)
+        .input('jumlah_pinjam', mssql.Int, parseInt(Chart.jumlah))
+        .execute('save_chart');
+      
+      callback(result.recordset);
+    }
+  } catch (error) {
+    callback(false)
+  }
+
+}
+
+const delete_chart = async (Chart, _key, callback) => {
+  try {
+    let valid = await getValidKeyAPI(_key);
+    if (valid) {
+
+      let pool = await getPool();
+      let result = await pool.request()
+        .input('kode_ktp', mssql.Char(16), Chart.id_ktp)
+        .input('id_kamera', mssql.Char(5), Chart.id_kamera)
+        .execute('delete_chart_product');
+      console.log(result);
+      callback(result.recordset);
+    }
+  } catch (error) {
+    callback(false);
+  }
+}
 module.exports.getChart = getChart;
+module.exports.saveChart = saveChart;
+module.exports.deleteChart = delete_chart;
