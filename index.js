@@ -4,11 +4,11 @@ const app = express();
 const Joi = require('joi');
 const helmet = require('helmet')
 const morgan = require('morgan');
-const logins = require('./main_api/authentication');
-const registers = require('./main_api/regsiter');
-const mainAPI  = require('./main_api/request_list') ;
+const logins = require('./core/authentication');
+const registers = require('./core/regsiter');
+const mainAPI  = require('./core/request_list') ;
 const keyAPI = require('./security/KeyApi');
-const ChartAPI = require('./main_api/chartRouters');
+const ChartAPI = require('./core/chartRouters');
 
 app.use(express.json())
 app.use(helmet());
