@@ -9,6 +9,7 @@ const registers = require('./core/regsiter');
 const mainAPI  = require('./core/request_list') ;
 const keyAPI = require('./security/KeyApi');
 const ChartAPI = require('./core/chartRouters');
+const KwintasiAPI = require('./core/kwintasiRouters');
 
 app.use(express.json())
 app.use(helmet());
@@ -49,6 +50,9 @@ app.use('/api/v1/data' ,mainAPI);
 
 //chart
 app.use('/api/v1/charts' ,ChartAPI);
+
+//kwintasi
+app.use('api/v1/kwintasi',KwintasiAPI);
 
 // error handle
 app.use(function (req, res, next) {
