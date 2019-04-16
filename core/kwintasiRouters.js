@@ -1,6 +1,6 @@
 const expess = require('express');
 const router = expess.Router( );
-const Kwintasi = require('../Objects/kwintasi');
+const Kwintasi = require('../Objects/Kwintasi');
 const Joi = require('joi');
 
 router.get('/:id', (req, res) => {

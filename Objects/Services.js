@@ -1,37 +1,40 @@
 const dbconfig = require('../utils/connnection_sql');
 const mssql = require('mssql')
-const bcrypt = require('bcrypt')
-const key = require('../security/KeyApi');
-const Joi = require('joi');
 
 
-const getProducts = async (callback) => {
+async function  getPool (){
+  return await new mssql.ConnectionPool(dbconfig).connect();
+}
+
+const getService = async (callback) => {
   try {
       let pool =  await getPool();
       let result2 = await pool.request()
-        .execute('getProducts')
+        .execute('getServices')
       await  callback(result2);
       await mssql.close();
 
   
   } catch (err) {
     console.log(err);
+    mssql.close();
   }
 }
 
-const d_product = async (_id , callback) =>{
+const d_service = async (_id , callback) =>{
   try {
     let pool = await getPool();
     let res = await  pool.request().
-    input('idkamera', mssql.Char(5) , _id)
-    .execute('getProduct');
+    input('id_service', mssql.Char(5) , _id)
+    .execute('getService');
     await callback(res);
     await mssql.close();
 
   } catch (error) {
     await callback (error);
+    mssql.close();
   }
 }
 
-module.exports.getProducts = getProducts;
-module.exports.product = d_product ;
+module.exports.service = d_service;
+module.exports.getServices = getService;

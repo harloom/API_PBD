@@ -2,7 +2,7 @@ const expess = require('express');
 const router = expess.Router();
 const User = require('../Objects/User');
 const Product = require('../Objects/Products');
-
+const Service = require('../Objects/Services');
 const Joi = require('joi');
 router.get('/', (req, res) => {
     res.send("API LIST");
@@ -20,9 +20,9 @@ router.get('/profile',(req,res)=>{
         User.getUser(resValidation.value.id_ktp,(result)=>{
                 if(result.rowsAffected == 0){
                     res.status(404).send({massage : "404 Senpai"});
-                }
+                }else{
                     res.status(200).send(result.recordset);
-                
+            }
             
         });
     }
@@ -35,9 +35,53 @@ router.get('/products', (req, res) => {
     });
 });
 
+router.get('/products/:id', (req,res )=>{
+    const valid  = Joi.validate(req.params,SchemaProduct , {escapeHtml : true})
+    if(valid.error){
+        res.status(400).send(valid.error.message)
+    }else{
+        Product.product(valid.value.id, (result) =>{
+            if(result.rowsAffected == 0 ){
+                res.status(404).send({massage : "404 Senpai"});
+            }else{
+                res.status(200).send(result.recordset)
+            }
+            
+        })
+    }
+});
+
+router.get('/services',(req,res) =>{
+    Service.getServices(result =>{
+        res.status(200).send(result.recordset);
+    })
+});
+
+router.get('/services/:id',(req,res) =>{
+    const valid = Joi.validate(req.params,SchemaService,{escapeHtml:true});
+    if(valid.error){
+        res.status(400).send(valid.error.message);
+    }else{
+    
+        Service.service(valid.value.id, (result) =>{
+            if(result.rowsAffected == 0 ){
+                res.status(404).send({massage : "404 Senpai"});
+            }
+            res.status(200).send(result.recordset);
+        });
+    }
+});
+
 
 const ScemeaUserProfile ={
     id_ktp : Joi.string().min(16).max(16).required()
 
+}
+const SchemaProduct = {
+    id : Joi.string().min(5).max(5).required()
+}
+
+const SchemaService = {
+    id : Joi.string().min(5).max(5).required()
 }
 module.exports = router;
