@@ -4,6 +4,9 @@ const bcrypt = require('bcrypt')
 const key = require('../security/KeyApi');
 const Joi = require('joi');
 
+async function getPool() {
+  return await new mssql.ConnectionPool(dbconfig).connect();
+}
 
 const getProducts = async (callback) => {
   try {

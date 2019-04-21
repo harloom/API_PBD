@@ -40,11 +40,9 @@ const getChart = async (id_ktp, keyAPI, callback) => {
       let result2 = await pool.request()
         .input('kode_ktp', mssql.Char(16), id_ktp)
         .execute('getChart')
-
       if (result2.recordset) {
         let resulta = await getTotal(result2);
         await callback(resulta);
-
       } else {
         callback(false);
       }

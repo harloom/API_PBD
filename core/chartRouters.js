@@ -19,7 +19,7 @@ router.get('/', (req, res) => {
 
       Chart.getChart(validation.value.id_ktp,validateHeader.value,(result)=>{
         if(!result){
-          res.status(400).send({massage : "404 Bad Request"});
+          res.status(404).send({massage : "404 Not Found Senpai"});
         }else{
           res.status(200).send(result);
         }

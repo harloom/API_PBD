@@ -52,7 +52,7 @@ app.use('/api/v1/data' ,mainAPI);
 app.use('/api/v1/charts' ,ChartAPI);
 
 //kwintasi
-app.use('api/v1/kwintasi',KwintasiAPI);
+app.use('/api/v1/kwintasi',KwintasiAPI);
 
 // error handle
 app.use(function (req, res, next) {
