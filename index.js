@@ -10,7 +10,7 @@ const mainAPI  = require('./core/request_list') ;
 const keyAPI = require('./security/KeyApi');
 const ChartAPI = require('./core/chartRouters');
 const KwintasiAPI = require('./core/kwintasiRouters');
-
+const FileDownload = require('./file/fileDownload');
 app.use(express.json())
 app.use(helmet());
 app.use(morgan('tiny'));
@@ -39,7 +39,7 @@ app.post('/api/v1/patrik',(req, res) => {
   }
 });
 
-//authen
+//authen/
 app.use('/api/v1/authentication',logins);
 
 //register
@@ -54,6 +54,8 @@ app.use('/api/v1/charts' ,ChartAPI);
 //kwintasi
 app.use('/api/v1/kwintasi',KwintasiAPI);
 
+
+app.use('/api/v1/file' , FileDownload);
 // error handle
 app.use(function (req, res, next) {
   res.status(404).send("Sorry can't find that Senpai!")
