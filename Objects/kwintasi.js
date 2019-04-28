@@ -88,5 +88,56 @@ const save_kwintasi = async (_key, Kwin, callback) => {
 
 }
 
-// const getViewKwitansi = async ()
+const getViewKwitansi = async (_key , id_ktp ,callback) =>{
+try {
+  let valid = await getValidKeyAPI(_key);
+  if (valid) {
+    let pool = await getPool();
+    let result = await pool.request()
+      .input('id_ktp', mssql.Char(16), id_ktp)
+      .execute('getViewKwitansi');
+      if(result.rowsAffected >0){
+        await callback(result.recordset);
+        await mssql.close();
+      }else{
+        await callback(false);
+        await mssql.close();
+      }
+     
+  }
+} catch (error) {
+ console.log(error);
+ await callback(error);
+ await mssql.close();
+}
+
+}
+
+
+const getViewDetailKwitansi = async (_key , id ,callback) =>{
+  try {
+    let valid = await getValidKeyAPI(_key);
+    if (valid) {
+      let pool = await getPool();
+      let result = await pool.request()
+        .input('no_kwitansi', mssql.Char(10), id)
+        .execute('getViewDetailKwitansi');
+        if(result.rowsAffected >0){
+          await callback(result.recordset);
+          await mssql.close();
+        }else{
+          await callback(false);
+          await mssql.close();
+        }
+    }
+  } catch (error) {
+   console.log(error);
+   await callback(error);
+   await mssql.close();
+  }
+  
+  }
+  
+module.exports.getDetail = getViewDetailKwitansi;
+module.exports.getViewKwitansi = getViewKwitansi;
 module.exports.PostKwin = save_kwintasi;

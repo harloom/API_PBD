@@ -31,7 +31,7 @@ router.post('/', (req, res) => {
 
 
 const SchemaUser = {
-  id_ktp: Joi.string().min(16).required(),
+  id_ktp: Joi.string().min(16).max(16).required(),
   nama: Joi.string().min(5).max(50).required(),
   tempat_lahir: Joi.string().min(3).max(25).required(),
   tanggal_lahir: Joi.date().min('1-1-1974').max('now').required(),
