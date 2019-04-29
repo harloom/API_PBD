@@ -49,7 +49,7 @@ const save_kwintasi = async (_key, Kwin, callback) => {
 
       if (result) {
         try {
-      
+
           console.dir(resultCompare);
           //ngambil di carts
           for (let i = 0; i < resultCompare.recordset.length; i++) {
@@ -62,8 +62,8 @@ const save_kwintasi = async (_key, Kwin, callback) => {
 
           await callback(resultDetailKwintasi);
           const clear = await pool.request()
-          .input('kode_ktp' ,mssql.Char(16),Kwin.id_ktp)
-          .execute('deleteChartAllByUser');
+            .input('kode_ktp', mssql.Char(16), Kwin.id_ktp)
+            .execute('deleteChartAllByUser');
           console.log(clear);
           await mssql.close();
 
@@ -88,33 +88,45 @@ const save_kwintasi = async (_key, Kwin, callback) => {
 
 }
 
-const getViewKwitansi = async (_key , id_ktp ,callback) =>{
-try {
-  let valid = await getValidKeyAPI(_key);
-  if (valid) {
-    let pool = await getPool();
-    let result = await pool.request()
-      .input('id_ktp', mssql.Char(16), id_ktp)
-      .execute('getViewKwitansi');
-      if(result.rowsAffected >0){
+const getViewKwitansi = async (_key, id_ktp, callback) => {
+  try {
+    let valid = await getValidKeyAPI(_key);
+    if (valid) {
+      let pool = await getPool();
+      let result = await pool.request()
+        .input('id_ktp', mssql.Char(16), id_ktp)
+        .execute('getViewKwitansi');
+      if (result.rowsAffected > 0) {
+        // await callback(result.recordset);
+        try {
+          let _detail = 'detail';
+          for (let i = 0; i < result.recordset.length; i++) {
+            let resultdetail = await detail(_key, result.recordset[i].no_kwitansi);
+            result.recordset[i][_detail] = resultdetail;
+          }
         await callback(result.recordset);
         await mssql.close();
-      }else{
+        } catch (error) {
+          await console.log(error);
+          await mssql.close();
+        }
+
+      } else {
         await callback(false);
         await mssql.close();
       }
-     
+
+    }
+  } catch (error) {
+    console.log(error);
+    await callback(error);
+    await mssql.close();
   }
-} catch (error) {
- console.log(error);
- await callback(error);
- await mssql.close();
-}
 
 }
 
 
-const getViewDetailKwitansi = async (_key , id ,callback) =>{
+const getViewDetailKwitansi = async (_key, id, callback) => {
   try {
     let valid = await getValidKeyAPI(_key);
     if (valid) {
@@ -122,22 +134,32 @@ const getViewDetailKwitansi = async (_key , id ,callback) =>{
       let result = await pool.request()
         .input('no_kwitansi', mssql.Char(10), id)
         .execute('getViewDetailKwitansi');
-        if(result.rowsAffected >0){
-          await callback(result.recordset);
-          await mssql.close();
-        }else{
-          await callback(false);
-          await mssql.close();
-        }
+      if (result.rowsAffected > 0) {
+        await callback(result.recordset);
+        await mssql.close();
+      } else {
+        await callback(false);
+        await mssql.close();
+      }
     }
   } catch (error) {
-   console.log(error);
-   await callback(error);
-   await mssql.close();
+    console.log(error);
+    await callback(error);
+    await mssql.close();
   }
-  
-  }
-  
+
+}
+
+function detail(_key, _id_ktp) {
+  return new Promise(resolve => {
+    getViewDetailKwitansi(_key, _id_ktp, (result) => {
+      resolve(result);
+
+    })
+  });
+}
+
+
 module.exports.getDetail = getViewDetailKwitansi;
 module.exports.getViewKwitansi = getViewKwitansi;
 module.exports.PostKwin = save_kwintasi;
