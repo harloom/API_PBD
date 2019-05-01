@@ -99,7 +99,7 @@ const getViewKwitansi = async (_key, id_ktp, callback) => {
       if (result.rowsAffected > 0) {
         // await callback(result.recordset);
         try {
-          let _detail = 'detail';
+          const _detail = 'detail';
           for (let i = 0; i < result.recordset.length; i++) {
             let resultdetail = await detail(_key, result.recordset[i].no_kwitansi);
             result.recordset[i][_detail] = resultdetail;
@@ -154,7 +154,6 @@ function detail(_key, _id_ktp) {
   return new Promise(resolve => {
     getViewDetailKwitansi(_key, _id_ktp, (result) => {
       resolve(result);
-
     })
   });
 }
