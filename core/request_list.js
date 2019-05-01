@@ -4,6 +4,11 @@ const User = require('../Objects/User');
 const Product = require('../Objects/Products');
 const Service = require('../Objects/Services');
 const Joi = require('joi');
+const ResponErrors = require('../utils/errorUtils');
+
+function getError(code  , massage){
+  return new ResponErrors(code,massage);
+}
 router.get('/', (req, res) => {
     res.send("API LIST");
 });
@@ -15,11 +20,11 @@ router.get('/search/:a',(req,res) => {
 router.get('/profile',(req,res)=>{
     const resValidation = Joi.validate(req.query,ScemeaUserProfile,{ escapeHtml: true })
     if(resValidation.error){
-        res.status(400).send(resValidation.error.message)
+        res.status(400).send(getError(404,resValidation.error.message));
     }else{
         User.getUser(resValidation.value.id_ktp,(result)=>{
                 if(result.rowsAffected == 0){
-                    res.status(404).send({massage : "404 Senpai"});
+                    res.status(404).send(new ResponErrors().get404());
                 }else{
                     res.status(200).send(result.recordset);
             }
@@ -38,11 +43,11 @@ router.get('/products', (req, res) => {
 router.get('/products/:id', (req,res )=>{
     const valid  = Joi.validate(req.params,SchemaProduct , {escapeHtml : true})
     if(valid.error){
-        res.status(400).send(valid.error.message)
+        res.status(400).send(getError(400,valid.error.message))
     }else{
         Product.product(valid.value.id, (result) =>{
             if(result.rowsAffected == 0 ){
-                res.status(404).send({massage : "404 Senpai"});
+                res.status(404).send(new ResponErrors().get404());
             }else{
                 res.status(200).send(result.recordset)
             }
@@ -60,12 +65,12 @@ router.get('/services',(req,res) =>{
 router.get('/services/:id',(req,res) =>{
     const valid = Joi.validate(req.params,SchemaService,{escapeHtml:true});
     if(valid.error){
-        res.status(400).send(valid.error.message);
+        res.status(400).send(getError(400,valid.error.message));
     }else{
     
         Service.service(valid.value.id, (result) =>{
             if(result.rowsAffected == 0 ){
-                res.status(404).send({massage : "404 Senpai"});
+                res.status(404).send(new ResponErrors().get404());
             }
             res.status(200).send(result.recordset);
         });

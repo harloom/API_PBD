@@ -2,24 +2,29 @@ const expess = require('express');
 const router = expess.Router( );
 const Chart = require('../Objects/Charts');
 const Joi = require('joi');
+const ResponErrors = require('../utils/errorUtils');
 
+function getError(code  , massage){
+  return new ResponErrors(code,massage);
+  
+}
 
 router.get('/', (req, res) => {
   const validation = Joi.validate(req.query,Schema,{escapeHtml: true });
   if(validation.error){
-    res.status(400).send(validation.error);
+    res.status(400).send(getError(401,validation.error));
   
   }else{
 
     const validateHeader = Joi.validate(req.headers.key_api,SchemaHeaders,{escapeHtml: true});
     if(validateHeader.error){
-      res.status(400).send(validateHeader.error);
+      res.status(400).send(getError(400,validateHeader.error));
     }else{
       // console.log(validateHeader.value);
 
       Chart.getChart(validation.value.id_ktp,validateHeader.value,(result)=>{
         if(!result){
-          res.status(404).send({massage : "404 Not Found Senpai"});
+          res.status(404).send(new ResponErrors().get404());
         }else{
           res.status(200).send(result);
         }
@@ -32,11 +37,11 @@ router.get('/', (req, res) => {
 router.put('/', (req, res) => {
   const validateHeader = Joi.validate(req.headers.key_api,SchemaHeaders,{escapeHtml: true});
   if(validateHeader.error){
-    res.status(400).send({massage : "404 Bad Request header"});
+    res.status(400).send(new ResponErrors().get400());
   }else{
     let valid = Joi.validate(req.body,SchemaPUT,{escapeHtml: true});
     if(valid.error){
-      res.status(400).send({massage : "404 Bad Request Body"});
+      res.status(400).send(new ResponErrors().get400());
     }else{
         Chart.edit_chart(valid.value,validateHeader.value,(result)=>{
           res.status(200).send(result);
@@ -48,15 +53,15 @@ router.put('/', (req, res) => {
 router.post('/', (req, res) => {
   let valid = Joi.validate(req.body,SchemaPost,{escapeHtml: true});
   if(valid.error){
-    res.status(400).send({massage : "404 Bad Request Body"});
+    res.status(400).send(new ResponErrors().get400());
   }else{
     const validateHeader = Joi.validate(req.headers.key_api,SchemaHeaders,{escapeHtml: true});
     if(validateHeader.error){
-      res.status(400).send({massage : "404 Bad Request header"});
+      res.status(400).send(new ResponErrors().get400());
     }else{
         Chart.saveChart(valid.value,validateHeader.value,(result)=>{
             !result?
-              res.status(403).send({massage : "Products Sudah Ada"}) : res.status(200).send(result);
+              res.status(403).send(new ResponErrors().get403Product()) : res.status(200).send(result);
     
         });
     }
@@ -68,15 +73,15 @@ router.post('/', (req, res) => {
 router.delete('/', (req, res) => {
   let valid = Joi.validate(req.body,SchemaDelete,{escapeHtml: true});
   if(valid.error){
-    res.status(400).send({massage : "404 Bad Request Body"});
+    res.status(400).send(new ResponErrors().get400());
   }else{
     const validateHeader = Joi.validate(req.headers.key_api,SchemaHeaders,{escapeHtml: true});
     if(validateHeader.error){
-      res.status(400).send({massage : "404 Bad Request header"});
+      res.status(400).send(new ResponErrors().get400());
     }else{
         Chart.deleteChart(valid.value,validateHeader.value,(result)=>{
             !result?
-              res.status(403).send({massage : "Products Tidak Ada"}) : res.status(200).send(result);
+              res.status(403).send(getError(403 , "Products Tidak Ada")) : res.status(200).send(result);
     
         });
     }
@@ -87,19 +92,19 @@ router.delete('/', (req, res) => {
 router.delete('/all', (req, res) => {
   const validation = Joi.validate(req.query,Schema,{escapeHtml: true });
   if(validation.error){
-    res.status(400).send(validation.error);
+    res.status(400).send(new ResponErrors().get400());
   
   }else{
 
     const validateHeader = Joi.validate(req.headers.key_api,SchemaHeaders,{escapeHtml: true});
     if(validateHeader.error){
-      res.status(400).send(validateHeader.error);
+      res.status(400).send(new ResponErrors().get400());
     }else{
       // console.log(validateHeader.value);
 
       Chart.delete_all(validation.value.id_ktp,validateHeader.value,(result)=>{
         if(!result){
-          res.status(400).send({massage : "404 Bad Request"});
+          res.status(400).send(new ResponErrors().get400());
         }else{
           res.status(200).send(result);
         }

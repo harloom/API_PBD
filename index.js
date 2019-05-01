@@ -2,6 +2,7 @@
 const express = require('express');
 const app = express();
 const Joi = require('joi');
+const ResponErrors = require('./utils/errorUtils');
 const helmet = require('helmet')
 const morgan = require('morgan');
 const logins = require('./core/authentication');
@@ -31,7 +32,7 @@ app.post('/api/v1/patrik',(req, res) => {
     escapeHtml: true
   });
   if(resultValidate.error){
-      res.status(400).send({massage : "400 Bad Request"});
+      res.status(400).send(new ResponErrors().get400());
   }else{
     keyAPI(resultValidate.value.key,result =>{
         result ? res.status(200).send({massage : true}) : res.status(200).send({massage : false});

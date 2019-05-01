@@ -2,19 +2,25 @@ const express = require('express');
 const router = express.Router();
 const Joi = require('joi');
 const User = require('../Objects/User');
+const ResponErrors = require('../utils/errorUtils');
+
+function getError(code  , massage){
+  return new ResponErrors(code,massage);
+}
+
 router.post('/', (req, res) => {
 
   const resultValidate = Joi.validate(req.body, SchemaUser, {
     escapeHtml: true
   });
   if (resultValidate.error) {
-    res.status(400).send(resultValidate.error.details[0].message);
+    res.status(400).send(getError(400,resultValidate.error.details[0].message));
   } else {
     let values = resultValidate.value;
     User.saveUser(values, (result) => {
       if(result.row){
         User.savePassword(result.row[0].id_ktp,values.password,(flag)=>{
-          res.status(200).send({massage : true });
+          res.status(200).send(flag);
         })
       }else{
         res.status(400).send(result);

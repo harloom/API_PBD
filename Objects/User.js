@@ -3,6 +3,11 @@ const mssql = require('mssql')
 const bcrypt = require('bcrypt')
 const randomstring = require("randomstring");
 const saltRounds = 10;
+const ResponErrors = require('../utils/errorUtils');
+
+function getError(code  , massage){
+  return error = new ResponErrors(code,massage);
+}
 
 
 function saveUserTASK(User, callback) {
@@ -31,10 +36,7 @@ function saveUserTASK(User, callback) {
             },(err, result) => {
               // console.dir(err);
               if (err) {
-                callback({
-                  error: true,
-                  massage : "User is Registered"
-                });
+                callback(getError('400','User is Registered'));
               } else {
                 let row = result.recordset;
                 callback({
@@ -81,7 +83,7 @@ const saveUsers  = async (id_ktp,plainText,callback) => {
         .input('key',mssql.VarChar(200),randomstring.generate(100))
         .execute('loginTask')
   
-      await callback(result2);
+      await callback(getError('200','Rigestered is Success'));
       await  mssql.close();
   
   } catch (err) {
@@ -123,7 +125,8 @@ const cek_login = async (id_ktp,no_hp,plainText,callback) => {
           await callback(resAPI.recordset[0]);
           await mssql.close();
         }else{
-          callback({massage : "password anda Salah"});
+
+          callback(getError(401,"ID/PASSWORD ANDA SALAH"));
         }
       }else{
         callback({massage : "id / password Salah!"});

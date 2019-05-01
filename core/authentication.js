@@ -3,33 +3,43 @@ const express = require('express');
 const router = express.Router();
 const User = require('../Objects/User');
 const Joi = require('joi');
+const ResponErrors = require('../utils/errorUtils');
+
+function getError(code  , massage){
+  return new ResponErrors(code,massage);
+}
+
 router.post('/', (req, res) => {
     if(req.headers.key =="ktp"){
-  
     const valid = Joi.validate(req.body,ScemaCekLoginKTP,{escapeHtml: true});
     if(valid.error){
-      res.status(400).send(valid.error);
+      res.status(400).send(getError(400,valid.error.details[0].message));
     }else{
   
       User.cek_login(valid.value.id_ktp,"null",valid.value.plaintext , (result)=>{
-        if(result){
+        if(result.keyAPI){
           res.status(200).send(result);
+        }else{
+          res.status(401).send(result);
         }
       });
     }
-  }else
-  if(req.headers.key =="hp"){
-    const valid = Joi.validate(req.body,ScemaCekLoginNoHP,{escapeHtml: true});
-    if(valid.error){
-      res.status(400).send(valid.error);
-    }else{
-      User.cek_login(valid.value.id_ktp,"",valid.value.plaintext , (result)=>{
-      
-          res.status(200).send(result[0]);
-   
-      });
-    }
+  }else{
+    res.status(400).send(new ResponErrors().get400());
   }
+  // else
+  // if(req.headers.key =="hp"){
+  //   const valid = Joi.validate(req.body,ScemaCekLoginNoHP,{escapeHtml: true});
+  //   if(valid.error){
+  //     res.status(400).send(valid.error);
+  //   }else{
+  //     User.cek_login(valid.value.id_ktp,"",valid.value.plaintext , (result)=>{
+      
+  //         res.status(200).send(result[0]);
+   
+  //     });
+  //   }
+  // }
 
   }
  );
