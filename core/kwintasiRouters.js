@@ -68,12 +68,13 @@ router.delete('/', (req, res) => {
 });
 
 
-router.get('/detail/:id', (req, res) => {
+router.get('/detail/:id_ktp/:id', (req, res) => {
   try {
     
     const validHeaders = Joi.validate(req.headers.key_api,SchemaKey,{escapeHtml:true});
     const validParams = Joi.validate(req.params.id,ShemaNoKwitansi,{escapeHtml:true});
-    if(validHeaders.error || validParams.error){
+    const validParamsidKtp = Joi.validate(req.params.id_ktp,ShemaIdKTP,{escapeHtml:true});
+    if(validHeaders.error || validParams.error ||validParamsidKtp.error ){
     
       res.status(401).send(new ResponErrors().get401());
       // res.status(500).send({massage : "500 Internal Server Error"});

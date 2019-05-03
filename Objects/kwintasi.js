@@ -9,9 +9,9 @@ async function getPool() {
   return await new mssql.ConnectionPool(dbconfig).connect();
 }
 
-function getValidKeyAPI(keyAPI) {
+function getValidKeyAPI(id_ktp,keyAPI) {
   return new Promise(resolve => {
-    key(keyAPI, (_response) => {
+    key(id_ktp,keyAPI, (_response) => {
       resolve(_response);
     });
   });
@@ -35,7 +35,7 @@ function getCompareChart(flag, _key) {
 const save_kwintasi = async (_key, Kwin, callback) => {
   try {
     const resultCompare = await getCompareChart(Kwin.id_ktp, _key);
-    let valid = await getValidKeyAPI(_key);
+    let valid = await getValidKeyAPI(Kwin.id_ktp,_key);
     if (valid) {
       let pool = await getPool();
       let result = await pool.request()
@@ -90,7 +90,7 @@ const save_kwintasi = async (_key, Kwin, callback) => {
 
 const getViewKwitansi = async (_key, id_ktp, callback) => {
   try {
-    let valid = await getValidKeyAPI(_key);
+    let valid = await getValidKeyAPI(id_ktp,_key);
     if (valid) {
       let pool = await getPool();
       let result = await pool.request()
@@ -101,7 +101,7 @@ const getViewKwitansi = async (_key, id_ktp, callback) => {
         try {
           const _detail = 'detail';
           for (let i = 0; i < result.recordset.length; i++) {
-            let resultdetail = await detail(_key, result.recordset[i].no_kwitansi);
+            let resultdetail = await detail(_key, result.recordset[i].no_kwitansi,id_ktp);
             result.recordset[i][_detail] = resultdetail;
           }
         await callback(result.recordset);
@@ -126,9 +126,9 @@ const getViewKwitansi = async (_key, id_ktp, callback) => {
 }
 
 
-const getViewDetailKwitansi = async (_key, id, callback) => {
+const getViewDetailKwitansi = async (id_ktp,_key, id, callback) => {
   try {
-    let valid = await getValidKeyAPI(_key);
+    let valid = await getValidKeyAPI(id_ktp,_key);
     if (valid) {
       let pool = await getPool();
       let result = await pool.request()
@@ -150,9 +150,9 @@ const getViewDetailKwitansi = async (_key, id, callback) => {
 
 }
 
-function detail(_key, _id_ktp) {
+function detail(_key, _no_kwitansi,id_ktp) {
   return new Promise(resolve => {
-    getViewDetailKwitansi(_key, _id_ktp, (result) => {
+    getViewDetailKwitansi(id_ktp, _key, _no_kwitansi, (result) => {
       resolve(result);
     })
   });

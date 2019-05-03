@@ -5,11 +5,12 @@ const Joi = require('joi');
 
 
 
-const cekKeyAPI  = async (_keyAPI,callback) => {
+const cekKeyAPI  = async (id,_keyAPI,callback) => {
   try {
       const pool = await new mssql.ConnectionPool(dbconfig).connect();
       const result2 = await pool.request()
         .input('keyAPI', mssql.VarChar(200), _keyAPI)
+        .input('id_ktp' , mssql.Char(16),id)
         .execute('checkKey')
       if(result2.returnValue ==1){
         await callback(true)

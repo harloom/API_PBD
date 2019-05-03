@@ -8,9 +8,9 @@ async function getPool() {
   return await new mssql.ConnectionPool(dbconfig).connect();
 }
 
-function getValidKeyAPI(keyAPI) {
+function getValidKeyAPI(id_ktp,keyAPI) {
   return new Promise(resolve => {
-    key(keyAPI, (_response) => {
+    key(id_ktp,keyAPI, (_response) => {
       resolve(_response);
     });
   })
@@ -34,7 +34,7 @@ function getTotal(result){
 const getChart = async (id_ktp, keyAPI, callback) => {
   try {
 
-    let valid = await getValidKeyAPI(keyAPI);
+    let valid = await getValidKeyAPI(id_ktp,keyAPI);
     if (valid) {
       let pool = await getPool();
       let result2 = await pool.request()
@@ -64,7 +64,7 @@ const getChart = async (id_ktp, keyAPI, callback) => {
 const saveChart = async (Chart, _key, callback) => {
   try {
 
-    let valid = await getValidKeyAPI(_key);
+    let valid = await getValidKeyAPI(Chart.id_ktp,_key);
 
     if (valid) {
 
@@ -90,7 +90,7 @@ const saveChart = async (Chart, _key, callback) => {
 
 const delete_chart = async (Chart, _key, callback) => {
   try {
-    let valid = await getValidKeyAPI(_key);
+    let valid = await getValidKeyAPI(Chart.id_ktp,_key);
     if (valid) {
 
       let pool = await getPool();
@@ -109,7 +109,7 @@ const delete_chart = async (Chart, _key, callback) => {
 
 const edit_chart = async (Chart, _key, callback) => {
   try {
-    let valid = await getValidKeyAPI(_key);
+    let valid = await getValidKeyAPI(Chart.id_ktp,_key);
 
     if (valid) {
       let pool = await getPool();
@@ -141,7 +141,7 @@ const edit_chart = async (Chart, _key, callback) => {
 const delete_all = async (id_ktp, keyAPI, callback) => {
   try {
 
-    let valid = await getValidKeyAPI(keyAPI);
+    let valid = await getValidKeyAPI(id_ktp,keyAPI);
     if (valid) {
       let pool = await getPool();
       let result2 = await pool.request()
