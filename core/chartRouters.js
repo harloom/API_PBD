@@ -24,6 +24,7 @@ router.get('/', (req, res) => {
 
       Chart.getChart(validation.value.id_ktp,validateHeader.value,(result)=>{
         if(!result){
+          console.log(result);
           res.status(404).send(new ResponErrors().get404());
         }else{
           res.status(200).send(result);

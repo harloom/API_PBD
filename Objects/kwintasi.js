@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt')
 const key = require('../security/KeyApi');
 const Joi = require('joi');
 const Chart = require('../Objects/Charts');
+const randomstring = require("randomstring");
 
 async function getPool() {
   return await new mssql.ConnectionPool(dbconfig).connect();
@@ -39,7 +40,7 @@ const save_kwintasi = async (_key, Kwin, callback) => {
     if (valid) {
       let pool = await getPool();
       let result = await pool.request()
-        .input('no_kwitansi', mssql.Char(10), Kwin.no_kwitansi)
+        .input('no_kwitansi', mssql.Char(10), randomKwintasi())
         .input('id_ktp', mssql.Char(16), Kwin.id_ktp)
         .input('lama_pinjam', mssql.Int, Kwin.lama)
         .input('id_service', mssql.Char(5), Kwin.id_service)
@@ -156,6 +157,14 @@ function detail(_key, _no_kwitansi,id_ktp) {
       resolve(result);
     })
   });
+}
+
+function randomKwintasi(){
+  return no_kwitansi = randomstring.generate({
+    length:10,
+    charset: 'numeric'
+  });
+  
 }
 
 

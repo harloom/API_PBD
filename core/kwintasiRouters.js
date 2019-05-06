@@ -23,10 +23,10 @@ router.get('/:id', (req, res) => {
     const validParams = Joi.validate(req.params.id,ShemaIdKTP,{escapeHtml:true});
     if(validHeaders.error || validParams.error){
       res.status(401).send(new ResponErrors().get401());;
-     
     }else{
         Kwintasi.getViewKwitansi(validHeaders.value,validParams.value,(result)=>{
           if(result){
+            console.log(result);
             res.status(200).send(result);
           }else{
             res.status(404).send(new ResponErrors().get404());
@@ -52,7 +52,11 @@ router.post('/', (req, res) => {
           res.status(400).send(new ResponErrors().get400());
         }else{
           Kwintasi.PostKwin(validHeaders.value,valid.value,(resuult)=>{
-            res.status(200).send(resuult);  
+            if(!resuult){
+              new ResponErrors(500,"Terjadi Kesahalan Silahkan Coba Lagi");
+            }else{
+              res.status(200).send(resuult); 
+            }
           });
         }
     
@@ -96,7 +100,6 @@ router.get('/detail/:id_ktp/:id', (req, res) => {
   });
 
 const ScemaKwintasi = {
-  no_kwitansi : Joi.string().min(10).max(10).required(),
   id_ktp : Joi.string().min(16).max(16).required(),
   lama : Joi.number().min(1).max(10).required(),
   id_service : Joi.string().valid(["S0001","S0002"]).required() ,

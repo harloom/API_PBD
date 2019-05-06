@@ -129,7 +129,7 @@ const cek_login = async (id_ktp,no_hp,plainText,callback) => {
           callback(getError(401,"ID/PASSWORD ANDA SALAH"));
         }
       }else{
-        callback({massage : "id / password Salah!"});
+        callback(getError(401,"ID/PASSWORD ANDA SALAH"));
       }
         
 
