@@ -130,7 +130,8 @@ const SchemaHeaders = Joi.string().min(1).required();
 const SchemaPost = {
   id_ktp : Joi.string().min(16).max(16).required(),
   id_kamera : Joi.string().min(5).max(5).required(),
-  jumlah : Joi.string().min(1).max(3).required()
+  jumlah : Joi.string().min(1).max(3).required(),
+  service : Joi.string().min(5).max(5).required()
 }
 const SchemaDelete  ={
   id_ktp : Joi.string().min(16).max(16).required(),
@@ -139,7 +140,8 @@ const SchemaDelete  ={
 const SchemaPUT = {
   id_ktp : Joi.string().min(16).max(16).required(),
   id_kamera : Joi.string().min(5).max(5).required(),
-  jumlah  : Joi.string().max(2).required()
+  jumlah  : Joi.string().max(2).required(),
+  service : Joi.string().min(5).max(5).required()
 }
 module.exports = router;
 

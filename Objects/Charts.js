@@ -20,11 +20,15 @@ function getValidKeyAPI(id_ktp,keyAPI) {
 function getTotal(result){
   return new Promise(resolve =>{
       let totalbayar = 0;
+      let totalpajak = 0;
       for (let i = 0; i < result.recordset.length; i++) {
         totalbayar += result.recordset[i].jumlah_bayar;
+        totalpajak += result.recordset[i].pajak;
       }
       let _pTotal = 'total_bayar';
+      const _pajak = 'total_pajak';
       result[_pTotal] = totalbayar;
+      result[_pajak]  = totalpajak;
       resolve(result);
   
   })
@@ -64,16 +68,14 @@ const getChart = async (id_ktp, keyAPI, callback) => {
 
 const saveChart = async (Chart, _key, callback) => {
   try {
-
     let valid = await getValidKeyAPI(Chart.id_ktp,_key);
-
     if (valid) {
-
       let pool = await getPool();
       let result = await pool.request()
         .input('kode_ktp', mssql.Char(16), Chart.id_ktp)
         .input('id_kamera', mssql.Char(5), Chart.id_kamera)
         .input('jumlah_pinjam', mssql.Int, parseInt(Chart.jumlah))
+        .input('service',mssql.Char(5) ,Chart.service)
         .execute('save_chart');  
       await callback(result.recordset);
       await mssql.close();
@@ -123,6 +125,7 @@ const edit_chart = async (Chart, _key, callback) => {
         .input('kode_ktp', mssql.Char(16), Chart.id_ktp)
         .input('id_kamera', mssql.Char(5), Chart.id_kamera)
         .input('jumlah_pinjam', mssql.Int, parseInt(Chart.jumlah))
+        .input('service',mssql.Char(5) ,Chart.service)
         .execute('jumlahProductChart');
 
         if (result.recordset[0] !=null) {
