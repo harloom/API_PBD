@@ -36,6 +36,7 @@ router.get('/profile',(req,res)=>{
 
 router.get('/products', (req, res) => {
     Product.getProducts(result=>{
+        console.log("get Products");
         res.status(200).send(result.recordset);
     });
 });
