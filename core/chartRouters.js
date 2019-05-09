@@ -24,7 +24,6 @@ router.get('/', (req, res) => {
 
       Chart.getChart(validation.value.id_ktp,validateHeader.value,(result)=>{
         if(!result){
-          console.log(result);
           res.status(404).send(new ResponErrors().get404());
         }else{
           res.status(200).send(result);
@@ -45,7 +44,13 @@ router.put('/', (req, res) => {
       res.status(400).send(new ResponErrors().get400());
     }else{
         Chart.edit_chart(valid.value,validateHeader.value,(result)=>{
-          res.status(200).send(result);
+          console.log(result);
+          if(result){
+            res.status(200).send(result);
+          }else{
+            res.status(404).send(new ResponErrors(400,"Data Tidak Ada"));
+          }
+         
         });
     }
   }
@@ -107,7 +112,7 @@ router.delete('/all', (req, res) => {
         if(!result){
           res.status(400).send(new ResponErrors().get400());
         }else{
-          res.status(200).send(result);
+          res.status(200).send(new ResponErrors(200,"Data Berhasil Terhapus"));
         }
       });
     }

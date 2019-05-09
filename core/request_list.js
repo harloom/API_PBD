@@ -26,7 +26,7 @@ router.get('/profile',(req,res)=>{
                 if(result.rowsAffected == 0){
                     res.status(404).send(new ResponErrors().get404());
                 }else{
-                    res.status(200).send(result.recordset);
+                    res.status(200).send(result.recordset[0]);
             }
             
         });

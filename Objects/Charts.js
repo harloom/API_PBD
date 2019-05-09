@@ -41,8 +41,7 @@ const getChart = async (id_ktp, keyAPI, callback) => {
       let result2 = await pool.request()
         .input('kode_ktp', mssql.Char(16), id_ktp)
         .execute('getChart')
-      if (result2.recordset) {
-        console.log(result2);
+      if (result2.rowsAffected>0) {
         let resulta = await getTotal(result2);
         await callback(resulta);
       } else {
@@ -75,9 +74,7 @@ const saveChart = async (Chart, _key, callback) => {
         .input('kode_ktp', mssql.Char(16), Chart.id_ktp)
         .input('id_kamera', mssql.Char(5), Chart.id_kamera)
         .input('jumlah_pinjam', mssql.Int, parseInt(Chart.jumlah))
-        .execute('save_chart');
-
-  
+        .execute('save_chart');  
       await callback(result.recordset);
       await mssql.close();
     } else {
@@ -101,8 +98,15 @@ const delete_chart = async (Chart, _key, callback) => {
         .input('id_kamera', mssql.Char(5), Chart.id_kamera)
         .execute('delete_chart_product');
       // console.log(result);
-      await callback(result.recordset);
-      await mssql.close();
+
+      if(result.recordset[0] !=null){
+        await callback(result.recordset);
+        await mssql.close();
+      }else{
+        await callback(false);
+        await mssql.close();
+      }
+
     }
   } catch (error) {
     callback(false);
@@ -121,9 +125,11 @@ const edit_chart = async (Chart, _key, callback) => {
         .input('jumlah_pinjam', mssql.Int, parseInt(Chart.jumlah))
         .execute('jumlahProductChart');
 
-        if (result.recordset) {
+        if (result.recordset[0] !=null) {
+          console.log(result.rowsAffected.length);
           let resulta = await getTotal(result);
           await callback(resulta);
+
         } else {
           await callback(false);
         }
@@ -149,7 +155,13 @@ const delete_all = async (id_ktp, keyAPI, callback) => {
       let result2 = await pool.request()
         .input('kode_ktp', mssql.Char(16), id_ktp)
         .execute('deleteChartAllByUser')
-      await callback(result2);
+
+        if(result2.recordset[0] ==null){
+          await callback(true);
+        }else{
+          await callback(false);
+        }
+    
       await mssql.close();
     } else {
       callback(false);
