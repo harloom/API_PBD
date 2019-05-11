@@ -48,9 +48,9 @@ router.put('/', (req, res) => {
           if(result){
             res.status(200).send(result);
           }else{
-            res.status(404).send(new ResponErrors(400,"Data Tidak Ada"));
+            res.status(404).send(new ResponErrors(404,"Data Tidak Ada"));
           }
-         
+
         });
     }
   }
