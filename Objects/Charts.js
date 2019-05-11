@@ -17,7 +17,7 @@ function getValidKeyAPI(id_ktp,keyAPI) {
   
 }
 
-function getTotal(result){
+function getTotal(result , _lama){
   return new Promise(resolve =>{
       let totalbayar = 0;
       let totalpajak = 0;
@@ -27,8 +27,10 @@ function getTotal(result){
       }
       let _pTotal = 'total_bayar';
       const _pajak = 'total_pajak';
+      _lama>1?totalbayar = totalbayar*_lama: totalbayar*1;
       result[_pTotal] = totalbayar;
       result[_pajak]  = totalpajak;
+
       resolve(result);
   
   })
@@ -127,10 +129,9 @@ const edit_chart = async (Chart, _key, callback) => {
         .input('jumlah_pinjam', mssql.Int, parseInt(Chart.jumlah))
         .input('service',mssql.Char(5) ,Chart.service)
         .execute('jumlahProductChart');
-
         if (result.recordset[0] !=null) {
-          console.log(result.rowsAffected.length);
-          let resulta = await getTotal(result);
+          // console.log(result.rowsAffected.length);
+          let resulta = await getTotal(result,Chart.lama);
           await callback(resulta);
 
         } else {

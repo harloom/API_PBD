@@ -141,7 +141,8 @@ const SchemaPUT = {
   id_ktp : Joi.string().min(16).max(16).required(),
   id_kamera : Joi.string().min(5).max(5).required(),
   jumlah  : Joi.string().max(2).required(),
-  service : Joi.string().min(5).max(5).required()
+  service : Joi.string().min(5).max(5).required(),
+  lama : Joi.number().min(1).max(10).positive().integer()
 }
 module.exports = router;
 

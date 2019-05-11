@@ -39,8 +39,9 @@ const save_kwintasi = async (_key, Kwin, callback) => {
     let valid = await getValidKeyAPI(Kwin.id_ktp,_key);
     if (valid) {
       let pool = await getPool();
+      const _nokwitansi = randomKwintasi();
       let result = await pool.request()
-        .input('no_kwitansi', mssql.Char(10), randomKwintasi())
+        .input('no_kwitansi', mssql.Char(10), _nokwitansi)
         .input('id_ktp', mssql.Char(16), Kwin.id_ktp)
         .input('lama_pinjam', mssql.Int, Kwin.lama)
         .input('id_service', mssql.Char(5), Kwin.id_service)
@@ -55,7 +56,7 @@ const save_kwintasi = async (_key, Kwin, callback) => {
           //ngambil di carts
           for (let i = 0; i < resultCompare.recordset.length; i++) {
             var resultDetailKwintasi = await pool.request()
-              .input('no_kwitansi', mssql.Char(10), Kwin.no_kwitansi)
+              .input('no_kwitansi', mssql.Char(10), _nokwitansi)
               .input('id_kamera', mssql.Char(5), resultCompare.recordset[i].id_kamera)
               .input('jumlah_pinjam', mssql.Int, resultCompare.recordset[i].jumlah_pinjam)
               .execute('save_detail_kwitansi');
