@@ -1,7 +1,7 @@
 
 const express = require('express');
 const app = express();
-const Joi = require('joi');
+// const server = app.listen(3000);
 const ResponErrors = require('./utils/errorUtils');
 const helmet = require('helmet')
 const morgan = require('morgan');
@@ -16,15 +16,26 @@ app.use(express.json())
 app.use(helmet());
 app.use(morgan('tiny'));
 app.use(express.urlencoded({extended : true}));
+const Joi = require('joi');
+
+const port =3000;
+const server =  app.listen(port , () => {
+  console.log(`Example app listening on ${port} port!`);
+});
+
 
   app.use((req,res,next)=> {
     console.log("Logging.......");
     next();
 });
 app.use((req,res,next)=> {
+ 
   console.log("authentication......");
   next();
 });
+
+
+
 
 //cek KEY
 app.post('/api/v1/patrik',(req, res) => {
@@ -57,13 +68,21 @@ app.use('/api/v1/kwintasi',KwintasiAPI);
 
 
 app.use('/api/v1/file' , FileDownload);
+
+
+
+
+const io = require('socket.io').listen(server);
+app.get('/', function(req, res){
+  req.io = io;
+  res.sendFile(__dirname + '/public/index.html');
+  
+});
+io.on('connection', function(socket){
+  console.log('a user connected');
+});
+
 // error handle
 app.use(function (req, res, next) {
   res.status(404).send("Sorry can't find that Senpai!")
 });
-
-const port =3000;
-app.listen(port , () => {
-  console.log(`Example app listening on ${port} port!`);
-});
-

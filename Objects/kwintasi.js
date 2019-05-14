@@ -22,10 +22,9 @@ function getValidKeyAPI(id_ktp,keyAPI) {
 function getCompareChart(flag, _key) {
   return new Promise((resolve, reject) => {
     Chart.getChart(flag, _key, (_response) => {
-      if (!_response.recordset.length > 0) {
-        reject({
-          OrderError: true
-        });
+      console.log( _response.recordset )
+      if (_response.recordset == null) {
+        reject(false);
       } else {
         resolve(_response);
       }
@@ -66,11 +65,10 @@ const save_kwintasi = async (_key, Kwin, callback) => {
           const clear = await pool.request()
             .input('kode_ktp', mssql.Char(16), Kwin.id_ktp)
             .execute('deleteChartAllByUser');
-          console.log(clear);
+
           await mssql.close();
 
         } catch (error) {
-          await console.log(error)
           await callback(error)
           await mssql.close();
         }

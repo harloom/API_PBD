@@ -53,9 +53,9 @@ router.post('/', (req, res) => {
         }else{
           Kwintasi.PostKwin(validHeaders.value,valid.value,(resuult)=>{
             if(!resuult){
-              new ResponErrors(500,"Terjadi Kesahalan Silahkan Coba Lagi");
+              res.status(500).send(new ResponErrors(500,"Terjadi Kesahalan Silahkan Coba Lagi"));
             }else{
-              res.status(200).send(resuult); 
+              res.status(200).send(new ResponErrors(200,"Success Pesan")); 
             }
           });
         }
