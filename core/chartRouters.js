@@ -44,7 +44,7 @@ router.put('/', (req, res) => {
       res.status(400).send(new ResponErrors().get400());
     }else{
         Chart.edit_chart(valid.value,validateHeader.value,(result)=>{
-          console.log(result);
+
           if(result){
             res.status(200).send(result);
           }else{

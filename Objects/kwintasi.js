@@ -10,9 +10,9 @@ async function getPool() {
   return await new mssql.ConnectionPool(dbconfig).connect();
 }
 
-function getValidKeyAPI(id_ktp,keyAPI) {
+function getValidKeyAPI(id_ktp, keyAPI) {
   return new Promise(resolve => {
-    key(id_ktp,keyAPI, (_response) => {
+    key(id_ktp, keyAPI, (_response) => {
       resolve(_response);
     });
   });
@@ -22,7 +22,7 @@ function getValidKeyAPI(id_ktp,keyAPI) {
 function getCompareChart(flag, _key) {
   return new Promise((resolve, reject) => {
     Chart.getChart(flag, _key, (_response) => {
-      console.log( _response.recordset )
+      // console.log(_response.recordset)
       if (_response.recordset == null) {
         reject(false);
       } else {
@@ -35,7 +35,7 @@ function getCompareChart(flag, _key) {
 const save_kwintasi = async (_key, Kwin, callback) => {
   try {
     const resultCompare = await getCompareChart(Kwin.id_ktp, _key);
-    let valid = await getValidKeyAPI(Kwin.id_ktp,_key);
+    let valid = await getValidKeyAPI(Kwin.id_ktp, _key);
     if (valid) {
       let pool = await getPool();
       const _nokwitansi = randomKwintasi();
@@ -90,7 +90,7 @@ const save_kwintasi = async (_key, Kwin, callback) => {
 
 const getViewKwitansi = async (_key, id_ktp, callback) => {
   try {
-    let valid = await getValidKeyAPI(id_ktp,_key);
+    let valid = await getValidKeyAPI(id_ktp, _key);
     if (valid) {
       let pool = await getPool();
       let result = await pool.request()
@@ -101,11 +101,11 @@ const getViewKwitansi = async (_key, id_ktp, callback) => {
         try {
           const _detail = 'detail';
           for (let i = 0; i < result.recordset.length; i++) {
-            let resultdetail = await detail(_key, result.recordset[i].no_kwitansi,id_ktp);
+            let resultdetail = await detail(_key, result.recordset[i].no_kwitansi, id_ktp);
             result.recordset[i][_detail] = resultdetail;
           }
-        await callback(result.recordset);
-        await mssql.close();
+          await callback(result.recordset);
+          await mssql.close();
         } catch (error) {
           await console.log(error);
           await mssql.close();
@@ -118,7 +118,6 @@ const getViewKwitansi = async (_key, id_ktp, callback) => {
 
     }
   } catch (error) {
-    console.log(error);
     await callback(error);
     await mssql.close();
   }
@@ -126,9 +125,9 @@ const getViewKwitansi = async (_key, id_ktp, callback) => {
 }
 
 
-const getViewDetailKwitansi = async (id_ktp,_key, id, callback) => {
+const getViewDetailKwitansi = async (id_ktp, _key, id, callback) => {
   try {
-    let valid = await getValidKeyAPI(id_ktp,_key);
+    let valid = await getValidKeyAPI(id_ktp, _key);
     if (valid) {
       let pool = await getPool();
       let result = await pool.request()
@@ -143,14 +142,14 @@ const getViewDetailKwitansi = async (id_ktp,_key, id, callback) => {
       }
     }
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     await callback(error);
     await mssql.close();
   }
 
 }
 
-function detail(_key, _no_kwitansi,id_ktp) {
+function detail(_key, _no_kwitansi, id_ktp) {
   return new Promise(resolve => {
     getViewDetailKwitansi(id_ktp, _key, _no_kwitansi, (result) => {
       resolve(result);
@@ -158,15 +157,58 @@ function detail(_key, _no_kwitansi,id_ktp) {
   });
 }
 
-function randomKwintasi(){
+function randomKwintasi() {
   return no_kwitansi = randomstring.generate({
-    length:10,
+    length: 10,
     charset: 'numeric'
   });
-  
+
 }
 
+const batalkanPesanan = async (_key, Data, callback) => {
+  try {
+    let isValid = await getValidKeyAPI(Data.id_ktp, _key);
+    if (isValid) {
+
+      let pool = await getPool();
+      let result = await pool.request()
+        .input('no_kwitansi', mssql.Char(10), Data.no_kwitansi)
+        .input('id_ktp', mssql.Char(16), Data.id_ktp)
+        .execute('batalkanPesanan');
+
+      if (result.returnValue == 0) {
+
+        try {
+          const _detail = 'detail';
+          for (let i = 0; i < result.recordset.length; i++) {
+            let resultdetail = await detail(_key, result.recordset[i].no_kwitansi, Data.id_ktp);
+            result.recordset[i][_detail] = resultdetail;
+          }
+          await callback(result.recordset);
+          await mssql.close();
+        } catch (error) {
+
+          await callback(false);
+          await mssql.close();
+        }
+
+      } else {
+        await callback(false);
+        await mssql.close();
+      }
+
+    } else {
+      callback(false);
+    }
+
+
+  } catch (error) {
+    await callback(error);
+    await mssql.close();
+  }
+}
 
 module.exports.getDetail = getViewDetailKwitansi;
 module.exports.getViewKwitansi = getViewKwitansi;
 module.exports.PostKwin = save_kwintasi;
+module.exports.batalkanPesana = batalkanPesanan;

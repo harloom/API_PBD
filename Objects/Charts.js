@@ -49,7 +49,7 @@ const getChart = async (id_ktp, keyAPI, callback) => {
 
     let valid = await getValidKeyAPI(id_ktp, keyAPI);
     if (valid) {
-      console.log(valid);
+     
       let pool = await getPool();
       let result2 = await pool.request()
         .input('kode_ktp', mssql.Char(16), id_ktp)
