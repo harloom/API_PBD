@@ -1,7 +1,7 @@
 const expess = require('express');
 const router = expess.Router( );
 const Chart = require('../Objects/Charts');
-const Joi = require('joi');
+const Joi = require('joi'); 
 const ResponErrors = require('../utils/errorUtils');
 
 function getError(code  , massage){
@@ -21,7 +21,6 @@ router.get('/', (req, res) => {
       res.status(400).send(getError(400,validateHeader.error));
     }else{
       // console.log(validateHeader.value);
-
       Chart.getChart(validation.value.id_ktp,validateHeader.value,(result)=>{
         if(!result){
           res.status(404).send(new ResponErrors().get404());

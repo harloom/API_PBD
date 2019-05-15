@@ -157,6 +157,15 @@ function detail(_key, _no_kwitansi, id_ktp) {
   });
 }
 
+function detailHisory(_no_kwitansi){
+  return new Promise(resolve =>{
+    getDetailHisory(_no_kwitansi,(result)=>{
+    resolve(result);
+    });
+  });
+
+}
+
 function randomKwintasi() {
   return no_kwitansi = randomstring.generate({
     length: 10,
@@ -177,20 +186,8 @@ const batalkanPesanan = async (_key, Data, callback) => {
         .execute('batalkanPesanan');
 
       if (result.returnValue == 0) {
-
-        try {
-          const _detail = 'detail';
-          for (let i = 0; i < result.recordset.length; i++) {
-            let resultdetail = await detail(_key, result.recordset[i].no_kwitansi, Data.id_ktp);
-            result.recordset[i][_detail] = resultdetail;
-          }
-          await callback(result.recordset);
+          await callback(true)
           await mssql.close();
-        } catch (error) {
-
-          await callback(false);
-          await mssql.close();
-        }
 
       } else {
         await callback(false);
@@ -208,7 +205,70 @@ const batalkanPesanan = async (_key, Data, callback) => {
   }
 }
 
+
+const getHistory =async (_key,id_ktp,callback)=>{
+  try {
+    let valid = await getValidKeyAPI(id_ktp, _key);
+    if (valid) {
+      let pool = await getPool();
+      let result = await pool.request()
+        .input('id_ktp', mssql.Char(16), id_ktp)
+        .execute('getHistory');
+      if (result.recordset[0] != null) {
+      
+        try {
+          const _detail = 'detail';
+          for (let i = 0; i < result.recordset.length; i++) {
+            let resultdetail = await detailHisory(result.recordset[i].no_kwitansi);
+            result.recordset[i][_detail] = resultdetail;
+          }
+          await callback(result.recordset);
+          await mssql.close();
+        } catch (error) {
+          await console.log(error);
+          await mssql.close();
+        }
+
+      } else {
+        await callback(false);
+        await mssql.close();
+      }
+
+    }else{
+      callback(false);
+    }
+  } catch (error) {
+    await callback(error);
+    await mssql.close();
+  }
+}
+
+const getDetailHisory = async (_no_kwitansi , callback) =>{
+  try {
+
+      let pool = await getPool();
+      let result = await pool.request()
+        .input('no_kwitansi', mssql.Char(10), _no_kwitansi)
+        .execute('getDetailHistory');
+      if (result.recordset[0] != null) {
+        await callback(result.recordset);
+        await mssql.close();
+      } else {
+        await callback(false);
+        await mssql.close();
+      }
+    
+  } catch (error) {
+    // console.log(error);
+    await callback(error);
+    await mssql.close();
+  }
+
+}
+
 module.exports.getDetail = getViewDetailKwitansi;
 module.exports.getViewKwitansi = getViewKwitansi;
 module.exports.PostKwin = save_kwintasi;
 module.exports.batalkanPesana = batalkanPesanan;
+
+module.exports.getHistory = getHistory ;

@@ -92,7 +92,7 @@ router.delete('/', (req, res) => {
       if (!result) {
         res.status(404).send(new ResponErrors().get404());
       } else {
-        res.status(200).send(result);
+        res.status(200).send(new ResponErrors(200,"Pesanan Berhasil Di Batalkan"));
       }
 
     })
@@ -129,10 +129,35 @@ router.get('/detail/:id_ktp/:id', (req, res) => {
     }
   } catch (error) {
     // res.status(500).send({massage : "500 Internal Server Error"});
+    res.status(500),send(new ResponErrors(500,"500 internal Server Errors"));
     console.log(error);
   }
 
 });
+
+
+router.get('/history/:id', (req, res) => {
+  const validHeaders = Joi.validate(req.headers.key_api, SchemaKey, {
+    escapeHtml: true
+  });
+  const validParams = Joi.validate(req.params.id, ShemaIdKTP, {
+    escapeHtml: true
+  });
+  if (validHeaders.error || validParams.error) {
+    res.status(401).send(new ResponErrors().get401());;
+  }else {
+    Kwintasi.getHistory(validHeaders.value, validParams.value, (result) => {
+      console.log(result);
+      if (result) {  
+        
+        res.status(200).send(result);
+      } else {
+        res.status(404).send(new ResponErrors().get404());
+      }
+
+    });
+    }
+  });
 
 const ScemaKwintasi = {
   id_ktp: Joi.string().min(16).max(16).required(),

@@ -44,6 +44,7 @@ function deleteChartItem(Chart, _key) {
 }
 
 
+
 const getChart = async (id_ktp, keyAPI, callback) => {
   try {
 
@@ -53,7 +54,8 @@ const getChart = async (id_ktp, keyAPI, callback) => {
       let pool = await getPool();
       let result2 = await pool.request()
         .input('kode_ktp', mssql.Char(16), id_ktp)
-        .execute('getChart')
+        .execute('getChart');
+        console.log(result2);
       if (result2.rowsAffected > 0) {
         let resulta = await getTotal(result2, 1);
         await callback(resulta);
@@ -79,6 +81,7 @@ const saveChart = async (Chart, _key, callback) => {
   try {
     let valid = await getValidKeyAPI(Chart.id_ktp, _key);
     if (valid) {
+        
       let pool = await getPool();
       let result = await pool.request()
         .input('kode_ktp', mssql.Char(16), Chart.id_ktp)
@@ -93,6 +96,7 @@ const saveChart = async (Chart, _key, callback) => {
 
     }
   } catch (error) {
+    console.log(error);
     callback(false)
   }
 
@@ -198,6 +202,8 @@ const delete_all = async (id_ktp, keyAPI, callback) => {
   }
 }
 
+
+// function cekChartInPorduct() {}
 module.exports.getChart = getChart;
 module.exports.saveChart = saveChart;
 module.exports.deleteChart = delete_chart;
