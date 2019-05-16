@@ -19,6 +19,14 @@ function getValidKeyAPI(id_ktp, keyAPI) {
 
 }
 
+function randomKwintasi() {
+  return no_kwitansi = randomstring.generate({
+    length: 10,
+    charset: 'numeric'
+  });
+
+}
+
 function getCompareChart(flag, _key) {
   return new Promise((resolve, reject) => {
     Chart.getChart(flag, _key, (_response) => {
@@ -30,6 +38,42 @@ function getCompareChart(flag, _key) {
       }
     });
   });
+}
+function securityBatalkanPesana(no_kwitansi){
+  return new Promise(resolve =>{
+    getStatusKwitansi(no_kwitansi, (result)=>{
+      if(!result){
+        //jika result tidak ada 
+        reject(false);
+      }else{
+        resolve(true)
+        //true siap dihapus
+      }
+    })
+
+
+  })
+}
+
+const getStatusKwitansi  = async (no_kwitansi, callback)=>{
+  try {
+    let pool = await getPool();
+    let result  = pool.request()
+    .input('no_kwitansi' ,mssql.Char(10),no_kwitansi)
+    .execute('batalkanPesananSecuirty');
+    if(result.recordset[0] !=null){
+      
+      await callback(result.recordset[0]); 
+      await mssql.close();
+    }else{
+      await callback(false);
+      await mssql.close();
+    }
+  } catch (error) {
+    await callback(false)
+    await mssql.close();
+  }
+
 }
 
 const save_kwintasi = async (_key, Kwin, callback) => {
@@ -166,18 +210,17 @@ function detailHisory(_no_kwitansi){
 
 }
 
-function randomKwintasi() {
-  return no_kwitansi = randomstring.generate({
-    length: 10,
-    charset: 'numeric'
-  });
 
-}
 
 const batalkanPesanan = async (_key, Data, callback) => {
   try {
     let isValid = await getValidKeyAPI(Data.id_ktp, _key);
-    if (isValid) {
+
+    /*   jika status dalam keadaan pinjam boleh di hapus kalo tidak
+        yang berarti dalam keaddan barang sedang di bawa maka tidak bisa di batalkan
+    */
+    let isPinjam= await securityBatalkanPesana(Data.no_kwitansi); 
+    if (isValid || isPinjam) {
 
       let pool = await getPool();
       let result = await pool.request()
@@ -206,7 +249,7 @@ const batalkanPesanan = async (_key, Data, callback) => {
 }
 
 
-const getHistory =async (_key,id_ktp,callback)=>{
+const getHistory = async (_key,id_ktp,callback)=>{
   try {
     let valid = await getValidKeyAPI(id_ktp, _key);
     if (valid) {

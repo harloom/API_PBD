@@ -75,14 +75,14 @@ router.put('/', (req, res) => {
 
 });
 
-router.delete('/', (req, res) => {
+router.delete('/:id_ktp/:no_kwitansi', (req, res) => {
   const validHeaders = Joi.validate(req.headers.key_api, SchemaKey, {
     escapeHtml: true
   });
-  const validBody = Joi.validate(req.body, SchemaBatalkan, {
+  const validBody = Joi.validate(req.params, SchemaBatalkan, {
     escapeHtml: true
   });
-
+  console.log(req.params);
   if (validBody.error || validHeaders.error) {
     res.status(400).send(new ResponErrors().get400());
     // res.status(400).send(validBody.error);
@@ -90,7 +90,7 @@ router.delete('/', (req, res) => {
     Kwintasi.batalkanPesana(validHeaders.value,validBody.value,(result)=>{
      
       if (!result) {
-        res.status(404).send(new ResponErrors().get404());
+        res.status(401).send(new ResponErrors(401,"Barang dalam Keadaan di USER"));
       } else {
         res.status(200).send(new ResponErrors(200,"Pesanan Berhasil Di Batalkan"));
       }
