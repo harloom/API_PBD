@@ -88,9 +88,10 @@ router.delete('/:id_ktp/:no_kwitansi', (req, res) => {
     // res.status(400).send(validBody.error);
   } else {
     Kwintasi.batalkanPesana(validHeaders.value,validBody.value,(result)=>{
-     
+  
       if (!result) {
-        res.status(401).send(new ResponErrors(401,"Barang dalam Keadaan di USER"));
+        console.log("data Sednag di terima")
+        res.status(200).send(new ResponErrors(500,"Barang dalam Keadaan di USER"));
       } else {
         res.status(200).send(new ResponErrors(200,"Pesanan Berhasil Di Batalkan"));
       }

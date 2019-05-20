@@ -40,10 +40,11 @@ function getCompareChart(flag, _key) {
   });
 }
 function securityBatalkanPesana(no_kwitansi){
-  return new Promise(resolve =>{
+  return new Promise((resolve ,reject)=>{
     getStatusKwitansi(no_kwitansi, (result)=>{
       if(!result){
         //jika result tidak ada 
+        // console.log("tooo")
         reject(false);
       }else{
         resolve(true)
@@ -58,11 +59,12 @@ function securityBatalkanPesana(no_kwitansi){
 const getStatusKwitansi  = async (no_kwitansi, callback)=>{
   try {
     let pool = await getPool();
-    let result  = pool.request()
+    let result  = await pool.request()
     .input('no_kwitansi' ,mssql.Char(10),no_kwitansi)
     .execute('batalkanPesananSecuirty');
+    
     if(result.recordset[0] !=null){
-      
+    
       await callback(result.recordset[0]); 
       await mssql.close();
     }else{
@@ -70,6 +72,7 @@ const getStatusKwitansi  = async (no_kwitansi, callback)=>{
       await mssql.close();
     }
   } catch (error) {
+  
     await callback(false)
     await mssql.close();
   }
@@ -220,8 +223,9 @@ const batalkanPesanan = async (_key, Data, callback) => {
         yang berarti dalam keaddan barang sedang di bawa maka tidak bisa di batalkan
     */
     let isPinjam= await securityBatalkanPesana(Data.no_kwitansi); 
+    // console.log(isPinjam);
     if (isValid || isPinjam) {
-
+    
       let pool = await getPool();
       let result = await pool.request()
         .input('no_kwitansi', mssql.Char(10), Data.no_kwitansi)
@@ -238,11 +242,15 @@ const batalkanPesanan = async (_key, Data, callback) => {
       }
 
     } else {
-      callback(false);
+     
+      await callback(false);
+      await mssql.close();
     }
 
 
   } catch (error) {
+    // console.log(error);
+    // console.log("data sedang di terima");
     await callback(error);
     await mssql.close();
   }
