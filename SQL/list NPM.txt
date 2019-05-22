@@ -1,2 +1,0 @@
-/* bycrypt
-https://www.npmjs.com/package/bcrypt
